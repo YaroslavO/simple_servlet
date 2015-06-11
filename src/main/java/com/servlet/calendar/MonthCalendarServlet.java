@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -17,11 +16,12 @@ import java.util.Locale;
  * Created by Yaroslav on 10.06.2015.
  */
 public class MonthCalendarServlet extends HttpServlet {
+    private static final boolean FORWARD = true;
+    private static final boolean BACKWARD = false;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        HttpSession session = req.getSession();
         Calendar calendar = Calendar.getInstance();
 
         if ((req.getParameter("year") != null) && (req.getParameter("month") != null)) {
@@ -29,25 +29,31 @@ public class MonthCalendarServlet extends HttpServlet {
             calendar.set(Calendar.MONTH, Integer.valueOf(req.getParameter("month")));
         }
 
-        MonthCalendar monthCalendar = new MonthCalendar(calendar);
+        HttpSession session = req.getSession();
+        session.setAttribute("monthCalendar", new MonthCalendar(calendar));
 
-        session.setAttribute("monthCalendar", monthCalendar);
+        session.setAttribute("dateTitle", makePageTitle(calendar));
+        session.setAttribute("monthHeader", WeekDayType.values());
 
-        String dateTitle = String.valueOf(calendar.get(Calendar.YEAR));
-        dateTitle += " " + calendar.getDisplayName(Calendar.MONTH, Calendar.LONG_FORMAT, Locale.UK);
+        session.setAttribute("prevUrl", getMonthUrl(rollMonth(calendar, BACKWARD)));
+        session.setAttribute("nexUrl", getMonthUrl(rollMonth(calendar, FORWARD)));
 
-        session.setAttribute("dateTitle", dateTitle);
-        session.setAttribute("monthTitle", Arrays.asList(WeekDayType.values()));
-
-        calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + 1);
-        session.setAttribute("nexLink", creteLink(calendar));
-
-        calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) - 2);
-        session.setAttribute("predLink", creteLink(calendar));
         req.getRequestDispatcher("/index.jsp").forward(req, resp);
     }
 
-    private static String creteLink(Calendar date) {
+    private Calendar rollMonth(Calendar calendar, boolean up) {
+        Calendar rolledCalendar = (Calendar) calendar.clone();
+        rolledCalendar.roll(Calendar.MONTH, up);
+        return rolledCalendar;
+    }
+
+    private String makePageTitle(Calendar calendar) {
+        String dateTitle = String.valueOf(calendar.get(Calendar.YEAR));
+        dateTitle += " " + calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.UK);
+        return dateTitle;
+    }
+
+    private static String getMonthUrl(Calendar date) {
         String result = "";
         result += "/index?year=" + date.get(Calendar.YEAR);
         result += "&month=" + date.get(Calendar.MONTH);

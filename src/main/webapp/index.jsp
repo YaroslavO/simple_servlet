@@ -21,42 +21,40 @@
     </div>
 
     <div class="row">
-        <a href="${nexLink}" class="btn btn-block btn-lg btn-success">Next Month</a>
-        <a href="${predLink}" class="btn btn-block btn-lg btn-success">Pred Month</a>
+        <div class="col-lg-6 well">
+            <a href="${prevUrl}" class="btn btn-block btn-lg btn-success">Prev Month</a>
+        </div>
+
+        <div class="col-lg-6 well">
+            <a href="${nexUrl}" class="btn btn-block btn-lg btn-success">Next Month</a>
+        </div>
     </div>
 
     <div class="row">
-        <table class="table">
+        <table class="table table-bordered">
             <tr>
-                <c:forEach var="item" items="${monthTitle}">
-                    <c:if test="${item.isWeekendDay()}">
-                        <th style="color: green">
-                    </c:if>
-
-                    <c:if test="${!item.isWeekendDay()}">
-                        <th>
-                    </c:if>
-
-                    ${item.toString()}</th>
-
+                <c:forEach var="dayOfWeek" items="${monthHeader}">
+                    <th class="${dayOfWeek.isWeekendDay() ? "success" : ""}">
+                        ${dayOfWeek}
+                    </th>
                 </c:forEach>
             </tr>
             <c:forEach var="week" items="${monthCalendar.getWeeks()}">
                 <tr>
                     <c:forEach var="weekDay" items="${week.getDays()}">
-                        <c:if test="${weekDay.isTheCurrentDay() && !weekDay.isOtherMonth()}">
-                            <td style="color: red">
+                        <c:if test="${weekDay.isTheCurrentDay()}">
+                            <td class="info">
                         </c:if>
                         <c:if test="${weekDay.isOtherMonth()}">
-                            <td style="color: grey">
+                            <td class="active">
                         </c:if>
-                        <c:if test="${weekDay.getType().isWeekendDay() && !weekDay.isOtherMonth()}">
-                            <td style="color: green">
+                        <c:if test="${weekDay.isWeekDay()}">
+                            <td class="success">
                         </c:if>
-                        <c:if test="${!weekDay.getType().isWeekendDay() && !weekDay.isOtherMonth() && !weekDay.isTheCurrentDay()}">
-                            <td>
+                        <c:if test="${weekDay.isHolidays()}">
+                            <td class="info">
                         </c:if>
-                                ${weekDay.toString()}
+                                ${weekDay}
                         </td>
                     </c:forEach>
                 </tr>
