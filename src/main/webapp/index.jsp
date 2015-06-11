@@ -43,14 +43,17 @@
                 <tr>
                     <c:forEach var="weekDay" items="${week.getDays()}">
                         <c:if test="${weekDay.isTheCurrentDay()}">
-                            <td class="info">
+                            <td class="danger">
                         </c:if>
+
                         <c:if test="${weekDay.isOtherMonth()}">
                             <td class="active">
                         </c:if>
+
                         <c:if test="${weekDay.isWeekDay()}">
                             <td class="success">
                         </c:if>
+
                         <c:if test="${weekDay.isHolidays()}">
                             <td class="info">
                         </c:if>
